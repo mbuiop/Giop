@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dollar Clicker - Earn Money by Clicking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            min-width: 150px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .dollar-container {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .dollar-btn {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #228B22, #32CD32);
+            border: none;
+            border-radius: 50%;
+            font-size: 4em;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dollar-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .dollar-btn:active {
+            transform: scale(0.95);
+        }
+
+        .dollar-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+
+        .dollar-btn:hover::before {
+            animation: shimmer 1s ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .click-effect {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffd700;
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-60px);
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #43a047, #388e3c);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #fff;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .close:hover {
+            opacity: 1;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .copy-field {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .copy-field input {
+            flex: 1;
+        }
+
+        .copy-btn {
+            padding: 12px 20px;
+            background: #ffd700;
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffed4e;
+            transform: scale(1.05);
+        }
+
+        .referral-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .admin-panel {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .transaction-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .transaction-hash {
+            font-family: monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            background: rgba(0,0,0,0.3);
+            padding: 5px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status.pending {
+            background: #ff9800;
+            color: white;
+        }
+
+        .status.approved {
+            background: #4caf50;
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 1001;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .notification.error {
+            background: #f44336;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .upgrade-info {
+            background: rgba(255,215,0,0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #ffd700;
+        }
+
+        .upgrade-info h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .power-indicator {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 5px 10px;
+            background: #ffd700;
+            color: #333;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2em;
+            }
+            
+            .dollar-btn {
+                width: 150px;
+                height: 150px;
+                font-size: 3em;
+            }
+            
+            .stats {
+                gap: 15px;
+            }
+            
+            .stat-card {
+                min-width: 120px;
+                padding: 15px;
+            }
+            
+            .controls {
+                gap: 15px;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">💰 Dollar Clicker</h1>
+            <p class="subtitle">Click to earn dollars! Minimum withdrawal: $20 (2,000,000 coins)</p>
+        </div>
+
+        <div class="game-area">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="coinCount">0</div>
+                    <div class="stat-label">Coins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="dollarValue">$0.00</div>
+                    <div class="stat-label">Dollar Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="clickPower">1</div>
+                    <div class="stat-label">Click Power</div>
+                </div>
+            </div>
+
+            <div class="dollar-container">
+                <button class="dollar-btn" id="dollarBtn">💵</button>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="openModal('depositModal')">💳 Deposit</button>
+                <button class="btn btn-secondary" onclick="openModal('withdrawModal')">💰 Withdraw</button>
+                <button class="btn btn-success" onclick="openModal('referralModal')">🔗 Referral</button>
+            </div>
+
+            <div class="upgrade-info">
+                <h3>💎 Upgrade Your Power!</h3>
+                <p>Make a deposit to increase your click power up to 10x!</p>
+                <p>Each deposit gives you more coins per click.</p>
+            </div>
+        </div>
+
+        <!-- Admin Access -->
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="btn btn-secondary" onclick="openAdminPanel()" style="background: rgba(255,255,255,0.1);">🔐 Admin Access</button>
+        </div>
+
+        <!-- Admin Login Modal -->
+        <div id="adminLoginModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal('adminLoginModal')">&times;</span>
+                <h2>🔐 Admin Login</h2>
+                <div class="form-group">
+                    <label>Admin Password:</label>
+                    <input type="password" id="adminPassword" placeholder="Enter admin password">
+                </div>
+                <button class="btn btn-success" onclick="verifyAdminPassword()" style="width: 100%;">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('depositModal')">&times;</span>
+            <h2>💳 Make a Deposit</h2>
+            <div class="form-group">
+                <label>Deposit Address:</label>
+                <div class="copy-field">
+                    <input type="text" id="depositAddress" value="TV61aTh98MGqmteYzda5AaBzdXgGqreG6A" readonly>
+                    <button class="copy-btn" onclick="copyToClipboard('depositAddress')">📋 Copy</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Transaction Hash:</label>
+                <input type="text" id="depositHash" placeholder="Enter your transaction hash after deposit">
+            </div>
+            <button class="btn btn-success" onclick="submitDeposit()" style="width: 100%;">Submit Deposit</button>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('withdrawModal')">&times;</span>
+            <h2>💰 Withdraw Funds</h2>
+            <div class="form-group">
+                <label>Your Wallet Address:</label>
+                <input type="text" id="withdrawAddress" placeholder="Enter your wallet address">
+            </div>
+            <div class="form-group">
+                <label>Amount (Minimum $20 - 2,000,000 coins):</label>
+                <input type="number" id="withdrawAmount" min="20" placeholder="Enter amount in USD">
+            </div>
+            <button class="btn btn-primary" onclick="submitWithdraw()" style="width: 100%;">Request Withdrawal</button>
+        </div>
+    </div>
+
+    <!-- Referral Modal -->
+    <div id="referralModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('referralModal')">&times;</span>
+            <h2>🔗 Referral Program</h2>
+            <div class="referral-info">
+                <h3>Enter Referral Code</h3>
+                <p>Enter a referral code to become someone's referral and earn bonuses!</p>
+            </div>
+            <div class="form-group">
+                <label>Enter Referral Code:</label>
+                <div class="copy-field">
+                    <input type="text" id="referralCodeInput" placeholder="Enter referral code here" style="flex: 2;">
+                    <button class="copy-btn" onclick="submitReferralCode()">✅ Submit</button>
+                </div>
+            </div>
+            <div class="form-group" id="referralStatus" style="display: none;">
+                <label>Your Referral Status:</label>
+                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-top: 10px;">
+                    <p id="referralStatusText"></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Your Unique Referral Code:</label>
+                <div class="copy-field">
+                    <input type="text" id="userReferralCode" readonly>
+                    <button class="copy-btn" onclick="copyToClipboard('userReferralCode')">📋 Copy</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Your Referral Link:</label>
+                <div class="copy-field">
+                    <input type="text" id="referralLink" readonly>
+                    <button class="copy-btn" onclick="copyToClipboard('referralLink')">📋 Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel" style="display: none;">
+        <h2>🔐 Admin Panel</h2>
+        <h3>Pending Deposits</h3>
+        <div id="pendingDeposits"></div>
+        <h3>Withdrawal Requests</h3>
+        <div id="withdrawalRequests"></div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            coins: 0,
+            clickPower: 1,
+            deposits: [],
+            withdrawals: [],
+            referralCode: '',
+            userId: '',
+            referredBy: null,
+            referrals: []
+        };
+
+        // Initialize game
+        function initGame() {
+            // Generate unique user ID and referral code
+            gameState.userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            gameState.referralCode = 'REF_' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            
+            // Load saved data
+            const savedData = JSON.parse(localStorage.getItem('dollarClickerData') || '{}');
+            if (savedData.coins !== undefined) {
+                gameState.coins = savedData.coins;
+                gameState.clickPower = savedData.clickPower || 1;
+                gameState.deposits = savedData.deposits || [];
+                gameState.withdrawals = savedData.withdrawals || [];
+                gameState.referralCode = savedData.referralCode || gameState.referralCode;
+                gameState.userId = savedData.userId || gameState.userId;
+                gameState.referredBy = savedData.referredBy || null;
+                gameState.referrals = savedData.referrals || [];
+            }
+            
+            updateDisplay();
+            updateReferralInfo();
+        }
+
+        // Update display
+        function updateDisplay() {
+            document.getElementById('coinCount').textContent = gameState.coins.toLocaleString();
+            document.getElementById('dollarValue').textContent = '$' + (gameState.coins / 100000).toFixed(2);
+            document.getElementById('clickPower').textContent = gameState.clickPower;
+        }
+
+        // Update referral info
+        function updateReferralInfo() {
+            document.getElementById('userReferralCode').value = gameState.referralCode;
+            document.getElementById('referralLink').value = window.location.href + '?ref=' + gameState.referralCode;
+            
+            // Update referral status
+            const statusDiv = document.getElementById('referralStatus');
+            const statusText = document.getElementById('referralStatusText');
+            
+            if (gameState.referredBy) {
+                statusDiv.style.display = 'block';
+                statusText.innerHTML = `
+                    <strong>✅ You are referred by:</strong> ${gameState.referredBy}<br>
+                    <strong>👥 Your referrals:</strong> ${gameState.referrals.length} users
+                `;
+            } else {
+                statusDiv.style.display = 'block';
+                statusText.innerHTML = `
+                    <strong>⭐ Status:</strong> Independent user<br>
+                    <strong>👥 Your referrals:</strong> ${gameState.referrals.length} users
+                `;
+            }
+        }
+
+        // Save game data
+        function saveGame() {
+            localStorage.setItem('dollarClickerData', JSON.stringify(gameState));
+        }
+
+        // Click handler
+        document.getElementById('dollarBtn').addEventListener('click', function(e) {
+            const earnedCoins = gameState.clickPower;
+            gameState.coins += earnedCoins;
+            
+            // Create click effect
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.textContent = '+' + earnedCoins;
+            effect.style.left = (e.clientX - e.target.getBoundingClientRect().left) + 'px';
+            effect.style.top = (e.clientY - e.target.getBoundingClientRect().top) + 'px';
+            
+            this.parentNode.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 1000);
+            
+            updateDisplay();
+            saveGame();
+        });
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            showNotification('Copied to clipboard!', 'success');
+        }
+
+        // Submit deposit
+        function submitDeposit() {
+            const hash = document.getElementById('depositHash').value.trim();
+            if (!hash) {
+                showNotification('Please enter transaction hash!', 'error');
+                return;
+            }
+            
+            const deposit = {
+                id: Date.now(),
+                userId: gameState.userId,
+                hash: hash,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            gameState.deposits.push(deposit);
+            saveGame();
+            
+            document.getElementById('depositHash').value = '';
+            closeModal('depositModal');
+            showNotification('Deposit submitted! Waiting for admin approval.', 'success');
+            
+            // Simulate admin data (in real app, this would be sent to server)
+            const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+            adminData.deposits = adminData.deposits || [];
+            adminData.deposits.push(deposit);
+            localStorage.setItem('adminData', JSON.stringify(adminData));
+        }
+
+        // Submit withdrawal
+        function submitWithdraw() {
+            const address = document.getElementById('withdrawAddress').value.trim();
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            
+            if (!address) {
+                showNotification('Please enter wallet address!', 'error');
+                return;
+            }
+            
+            if (amount < 20) {
+                showNotification('Minimum withdrawal is $20!', 'error');
+                return;
+            }
+            
+            const requiredCoins = amount * 100000;
+            if (gameState.coins < requiredCoins) {
+                showNotification('Insufficient coins! You need ' + requiredCoins.toLocaleString() + ' coins.', 'error');
+                return;
+            }
+            
+            const withdrawal = {
+                id: Date.now(),
+                userId: gameState.userId,
+                address: address,
+                amount: amount,
+                coins: requiredCoins,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            gameState.withdrawals.push(withdrawal);
+            gameState.coins -= requiredCoins;
+            saveGame();
+            
+            document.getElementById('withdrawAddress').value = '';
+            document.getElementById('withdrawAmount').value = '';
+            closeModal('withdrawModal');
+            showNotification('Withdrawal requested! Processing...', 'success');
+            updateDisplay();
+            
+            // Simulate admin data
+            const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+            adminData.withdrawals = adminData.withdrawals || [];
+            adminData.withdrawals.push(withdrawal);
+            localStorage.setItem('adminData', JSON.stringify(adminData));
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Admin panel functions
+        function openAdminPanel() {
+            openModal('adminLoginModal');
+        }
+
+        function verifyAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === '123456789') {
+                closeModal('adminLoginModal');
+                document.getElementById('adminPanel').style.display = 'block';
+                loadAdminData();
+                document.getElementById('adminPassword').value = '';
+                showNotification('Admin access granted!', 'success');
+            } else {
+                showNotification('Invalid password!', 'error');
+            }
+        }
+
+        function loadAdminData() {
+            const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+            
+            // Load deposits
+            const depositsContainer = document.getElementById('pendingDeposits');
+            depositsContainer.innerHTML = '';
+            
+            const deposits = adminData.deposits || [];
+            deposits.forEach(deposit => {
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                item.innerHTML = `
+                    <p><strong>User:</strong> ${deposit.userId}</p>
+                    <p><strong>Hash:</strong> <span class="transaction-hash">${deposit.hash}</span></p>
+                    <p><strong>Date:</strong> ${new Date(deposit.timestamp).toLocaleString()}</p>
+                    <p><strong>Status:</strong> <span class="status ${deposit.status}">${deposit.status}</span></p>
+                    ${deposit.status === 'pending' ? `<button class="btn btn-success" onclick="approveDeposit('${deposit.id}')">Approve</button>` : ''}
+                `;
+                depositsContainer.appendChild(item);
+            });
+            
+            // Load withdrawals
+            const withdrawalsContainer = document.getElementById('withdrawalRequests');
+            withdrawalsContainer.innerHTML = '';
+            
+            const withdrawals = adminData.withdrawals || [];
+            withdrawals.forEach(withdrawal => {
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                item.innerHTML = `
+                    <p><strong>User:</strong> ${withdrawal.userId}</p>
+                    <p><strong>Address:</strong> <span class="transaction-hash">${withdrawal.address}</span></p>
+                    <p><strong>Amount:</strong> $${withdrawal.amount}</p>
+                    <p><strong>Coins:</strong> ${withdrawal.coins.toLocaleString()}</p>
+                    <p><strong>Date:</strong> ${new Date(withdrawal.timestamp).toLocaleString()}</p>
+                    <p><strong>Status:</strong> <span class="status ${withdrawal.status}">${withdrawal.status}</span></p>
+                `;
+                withdrawalsContainer.appendChild(item);
+            });
+        }
+
+        function approveDeposit(depositId) {
+            const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+            const deposit = adminData.deposits.find(d => d.id == depositId);
+            
+            if (deposit) {
+                deposit.status = 'approved';
+                localStorage.setItem('adminData', JSON.stringify(adminData));
+                
+                // Update user's click power (simulate finding user)
+                const userData = JSON.parse(localStorage.getItem('dollarClickerData') || '{}');
+                if (userData.userId === deposit.userId) {
+                    userData.clickPower = Math.min(userData.clickPower + 1, 10);
+                    localStorage.setItem('dollarClickerData', JSON.stringify(userData));
+                    gameState.clickPower = userData.clickPower;
+                    updateDisplay();
+                }
+                
+                loadAdminData();
+                showNotification('Deposit approved! User click power increased.', 'success');
+            }
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target === modals[i]) {
+                    modals[i].style.display = 'none';
+                }
+            }
+        }
+
+        // Initialize game when page loads
+        window.onload = function() {
+            initGame();
+            
+            // Check for referral code in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if (refCode && !gameState.referredBy) {
+                // Auto-fill referral code if user came via referral link
+                document.getElementById('referralCodeInput').value = refCode;
+                showNotification('Referral code detected! Please submit it to get bonus coins.', 'success');
+            }
+        };
+    </script>
+</body>
+</html>
